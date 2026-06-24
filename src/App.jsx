@@ -1,15 +1,15 @@
-// App.jsx
-
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Home from "./pages/Home";
-import Game from "./pages/Game";
+import Home        from "./pages/Home";
+import PlayerSetup from "./pages/PlayerSetup";
+import Game        from "./pages/Game";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/game" element={<Game />} />
+        <Route path="/"      element={<Home />} />
+        <Route path="/setup" element={<PlayerSetup />} />
+        <Route path="/game"  element={<Game />} />
       </Routes>
     </BrowserRouter>
   );

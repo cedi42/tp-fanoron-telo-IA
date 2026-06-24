@@ -28,41 +28,68 @@ function IconBrain() {
   );
 }
 
+const TITLE = "Fanoron-Telo";
+// emblème : 0.0s → 0.8s
+// lettres  : commencent à 0.9s, espacées de 0.06s
+const EMBLEM_DURATION = 0.9;
+const LETTER_DELAY    = 0.06;
+
 export default function Home() {
   const navigate = useNavigate();
 
-  const startGame = (mode) => {
-    navigate("/game", { state: { mode } });
+  const goToSetup = (mode) => {
+    navigate("/setup", { state: { mode } });
   };
+
+  // délai après la fin des lettres
+  const lastLetterEnd = EMBLEM_DURATION + TITLE.length * LETTER_DELAY;
+  const subDelay      = lastLetterEnd + 0.1;
+  const dividerDelay  = subDelay + 0.2;
+  const btn1Delay     = dividerDelay + 0.25;
+  const btn2Delay     = btn1Delay + 0.15;
+  const btn3Delay     = btn2Delay + 0.15;
 
   return (
     <div className="home">
       <svg className="home__emblem" viewBox="0 0 64 64" fill="none">
         <rect x="8" y="8" width="48" height="48" rx="4" stroke="#8B2500" strokeWidth="1.5"/>
-        <line x1="8" y1="32" x2="56" y2="32" stroke="#6B3A1F" strokeWidth="1"/>
-        <line x1="32" y1="8" x2="32" y2="56" stroke="#6B3A1F" strokeWidth="1"/>
-        <line x1="8" y1="8" x2="56" y2="56" stroke="#6B3A1F" strokeWidth="1"/>
-        <line x1="56" y1="8" x2="8" y2="56" stroke="#6B3A1F" strokeWidth="1"/>
+        <line x1="8"  y1="32" x2="56" y2="32" stroke="#6B3A1F" strokeWidth="1"/>
+        <line x1="32" y1="8"  x2="32" y2="56" stroke="#6B3A1F" strokeWidth="1"/>
+        <line x1="8"  y1="8"  x2="56" y2="56" stroke="#6B3A1F" strokeWidth="1"/>
+        <line x1="56" y1="8"  x2="8"  y2="56" stroke="#6B3A1F" strokeWidth="1"/>
         {[8,32,56].map(x => [8,32,56].map(y => (
           <circle key={`${x}-${y}`} cx={x} cy={y} r="4" fill="#5A3018" stroke="#D4A843" strokeWidth="1"/>
         )))}
       </svg>
 
-      <h1 className="home__title">Fanoron-Telo</h1>
-      <p className="home__sub">Jeu Traditionnel Malgache</p>
+      <h1 className="home__title" aria-label={TITLE}>
+        {TITLE.split("").map((char, i) => (
+          <span
+            key={i}
+            className="home__letter"
+            style={{ animationDelay: `${EMBLEM_DURATION + i * LETTER_DELAY}s` }}
+          >
+            {char === "-" ? "\u2011" : char}
+          </span>
+        ))}
+      </h1>
 
-      <hr className="home__divider" />
+      <p className="home__sub" style={{ animationDelay: `${subDelay}s` }}>
+        Jeu Traditionnel Malgache
+      </p>
+
+      <hr className="home__divider" style={{ animationDelay: `${dividerDelay}s` }} />
 
       <nav className="home__menu">
-        <button className="home__btn" onClick={() => startGame("pvp")}>
+        <button className="home__btn" style={{ animationDelay: `${btn1Delay}s` }} onClick={() => goToSetup("pvp")}>
           <IconSwords />
           Humain vs Humain
         </button>
-        <button className="home__btn" onClick={() => startGame("pve")}>
+        <button className="home__btn" style={{ animationDelay: `${btn2Delay}s` }} onClick={() => goToSetup("pve")}>
           <IconBrain />
           Humain vs IA
         </button>
-        <button className="home__btn" onClick={() => startGame("eve")}>
+        <button className="home__btn" style={{ animationDelay: `${btn3Delay}s` }} onClick={() => goToSetup("eve")}>
           <IconRobot />
           IA vs IA
         </button>

@@ -21,14 +21,9 @@ const adjacency = {
 };
 
 const winningLines = [
-  ["a1", "b1", "c1"],
-  ["a2", "b2", "c2"],
-  ["a3", "b3", "c3"],
-  ["a1", "a2", "a3"],
-  ["b1", "b2", "b3"],
-  ["c1", "c2", "c3"],
-  ["a1", "b2", "c3"],
-  ["c1", "b2", "a3"],
+  ["a1", "b1", "c1"], ["a2", "b2", "c2"], ["a3", "b3", "c3"],
+  ["a1", "a2", "a3"], ["b1", "b2", "b3"], ["c1", "c2", "c3"],
+  ["a1", "b2", "c3"], ["c1", "b2", "a3"],
 ];
 
 function checkWinner(board) {
@@ -42,49 +37,42 @@ function checkWinner(board) {
 }
 
 export default function Game() {
-  const navigate   = useNavigate();
-  const location   = useLocation();
-  const mode       = location.state?.mode ?? "pvp";
+  const navigate  = useNavigate();
+  const location  = useLocation();
+  const mode      = location.state?.mode    ?? "pvp";
+  const nameX     = location.state?.player1 ?? "Joueur X";
+  const nameO     = location.state?.player2 ?? "Joueur O";
 
-  const [board, setBoard]               = useState(initialBoard);
+  const [board, setBoard]                 = useState(initialBoard);
   const [currentPlayer, setCurrentPlayer] = useState("X");
-  const [selected, setSelected]         = useState(null);
-  const [phase, setPhase]               = useState("placement");
-  const [placedPieces, setPlacedPieces] = useState({ X: 0, O: 0 });
+  const [selected, setSelected]           = useState(null);
+  const [phase, setPhase]                 = useState("placement");
+  const [placedPieces, setPlacedPieces]   = useState({ X: 0, O: 0 });
 
-  const result = checkWinner(board);
-  const winner = result?.player ?? null;
-  const winLine = result?.line ?? [];
+  const result  = checkWinner(board);
+  const winner  = result?.player ?? null;
+  const winLine = result?.line   ?? [];
+
+  const playerName = (p) => p === "X" ? nameX : nameO;
 
   const handleNodeClick = (position) => {
     if (winner) return;
 
     if (phase === "placement") {
       if (board[position] !== null) return;
-
-      const newBoard = { ...board, [position]: currentPlayer };
+      const newBoard  = { ...board, [position]: currentPlayer };
       const newPlaced = { ...placedPieces, [currentPlayer]: placedPieces[currentPlayer] + 1 };
-
       setBoard(newBoard);
       setPlacedPieces(newPlaced);
-
       if (newPlaced.X + newPlaced.O === 6) setPhase("movement");
       setCurrentPlayer(currentPlayer === "X" ? "O" : "X");
       return;
     }
 
-    if (board[position] === currentPlayer) {
-      setSelected(position);
-      return;
-    }
+    if (board[position] === currentPlayer) { setSelected(position); return; }
 
-    if (
-      selected &&
-      board[position] === null &&
-      adjacency[selected].includes(position)
-    ) {
-      const newBoard = { ...board, [position]: currentPlayer, [selected]: null };
-      setBoard(newBoard);
+    if (selected && board[position] === null && adjacency[selected].includes(position)) {
+      setBoard({ ...board, [position]: currentPlayer, [selected]: null });
       setSelected(null);
       setCurrentPlayer(currentPlayer === "X" ? "O" : "X");
     }
@@ -104,14 +92,12 @@ export default function Game() {
     <div className="game">
       <div className="game__header">
         <h1 className="game__title">Fanoron-Telo</h1>
-        <p style={{ fontSize: "11px", color: "#a07850", letterSpacing: "3px", textTransform: "uppercase", marginTop: "4px" }}>
-          {modeLabel}
-        </p>
+        <p className="game__mode">{modeLabel}</p>
       </div>
 
       {winner ? (
         <div className="game__winner">
-          🏆 Victoire : Joueur {winner}
+          🏆 Victoire : {playerName(winner)}
         </div>
       ) : (
         <div className="game__status">
@@ -123,14 +109,27 @@ export default function Game() {
           </span>
           <span>
             Tour :{" "}
-            <span className="game__player">Joueur {currentPlayer}</span>
+            <span className="game__player">{playerName(currentPlayer)}</span>
           </span>
         </div>
       )}
 
-      <div className="game__pions">
-        <span>X : {placedPieces.X}/3 pions</span>
-        <span>O : {placedPieces.O}/3 pions</span>
+      <div className="game__scoreboard">
+        <div className={`game__score-card${currentPlayer === "X" && !winner ? " game__score-card--active" : ""}`}>
+          <div className="game__score-pion game__score-pion--x" />
+          <div>
+            <div className="game__score-name">{nameX}</div>
+            <div className="game__score-count">{placedPieces.X}/3 pions</div>
+          </div>
+        </div>
+        <div className="game__score-vs">vs</div>
+        <div className={`game__score-card${currentPlayer === "O" && !winner ? " game__score-card--active" : ""}`}>
+          <div className="game__score-pion game__score-pion--o" />
+          <div>
+            <div className="game__score-name">{nameO}</div>
+            <div className="game__score-count">{placedPieces.O}/3 pions</div>
+          </div>
+        </div>
       </div>
 
       <Board
